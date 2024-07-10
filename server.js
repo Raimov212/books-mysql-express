@@ -4,6 +4,7 @@ import errorHandler from './middleware/error.js'
 import notFoundHandler from './middleware/notFound.js'
 import booksRoute from './routes/booksRoute.js'
 import fileRoute from './routes/fileRoute.js' 
+import usersRoute from './routes/usersRoute.js'
 
 const app = express();
 
@@ -14,6 +15,7 @@ app.use(loggerHandler)
 
 app.use('/books',booksRoute);
 app.use('/upload',fileRoute);
+app.use('/auth',usersRoute)
 
 app.use(notFoundHandler)
 app.use(errorHandler)

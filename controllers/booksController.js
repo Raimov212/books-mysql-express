@@ -1,4 +1,5 @@
 import db from "../connect/db.js";
+import booksValidation from "../hooks/validationBooks.js";
 
 export const allBooks = (req, res) => {
     if(!isNaN(req.query.limit) && (req.query.limit) > 0) {
@@ -28,48 +29,16 @@ export const searchBooks = (req,res,next)=>{
 
 export const addBook = (req, res,next) => {
     const q = "INSERT INTO books (`title`, `desc`, `cover`) VALUES (?)"
-    const values = [
+    
+    const {error} = booksValidation(req.body)
+    
+    if(error) return res.status(404).json({message : error.details[0].message})
+   
+        const values = [
         req.body.title,
         req.body.desc,
         req.body.cover
     ]
-
-    if(req.body.cover === "" ){
-        const err = new Error("cover is required")
-        err.status = 404
-        return next(err)
-    }
-
-    if(typeof req.body.cover == "number"){
-        const err = new Error("the cover value must be a string only")
-        err.status = 404
-        return next(err)
-    }
-
-    if(typeof req.body.title == "number"){
-        const err = new Error("the title value must be a string only")
-        err.status = 404
-        return next(err)
-    }
-
-    if(req.body.title === ""){
-        const err = new Error("title is required")
-        err.status = 404
-        return next(err)
-    } 
-    
-    if(req.body.desc === ""){
-        const err = new Error("description is required")
-        err.status = 404
-        return next(err)
-    }
-
-    if(typeof req.body.desc == "number"){
-        const err = new Error("the description value must be a string only")
-        err.status = 404
-        return next(err)
-    }
-
 
     db.query(q,[values], (err,data) => {
         if(err) {
@@ -108,11 +77,6 @@ export const deleteBook = (req, res,next) => {
         }else{
             return res.json("Book has been deleted successfully");
         }
-        // if(data.length == 0){
-        //     const err = new Error("Invalid book")
-        //     err.status = 404
-        //     return next(err)
-        // }
     })
 }
 
